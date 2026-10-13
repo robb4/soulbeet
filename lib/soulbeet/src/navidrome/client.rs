@@ -453,6 +453,7 @@ impl NavidromeClient {
         name: &str,
         comment: &str,
         filepath_contains: &str,
+        public: bool,
     ) -> Result<String> {
         let url = self
             .base_url
@@ -465,7 +466,7 @@ impl NavidromeClient {
         let body = serde_json::json!({
             "name": name,
             "comment": comment,
-            "public": false,
+            "public": public,
             "rules": {
                 "all": [
                     { "contains": { "filepath": filepath_contains } }

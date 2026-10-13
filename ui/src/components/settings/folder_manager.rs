@@ -20,6 +20,7 @@ pub fn FolderManager() -> Element {
 
     // Library settings state
     let mut auto_delete_enabled = use_signal(|| false);
+    let mut default_playlists_public = use_signal(|| false);
     let mut discovery_promote_threshold = use_signal(|| "3".to_string());
     let mut lastfm_api_key = use_signal(String::new);
     let mut lastfm_username = use_signal(String::new);
@@ -46,6 +47,7 @@ pub fn FolderManager() -> Element {
     use_effect(move || {
         if let Some(Ok(user_settings)) = &*settings_resource.read() {
             auto_delete_enabled.set(user_settings.auto_delete_enabled);
+            default_playlists_public.set(user_settings.default_playlists_public);
             discovery_promote_threshold.set(user_settings.discovery_promote_threshold.to_string());
             lastfm_api_key.set(user_settings.lastfm_api_key.clone().unwrap_or_default());
             lastfm_username.set(user_settings.lastfm_username.clone().unwrap_or_default());
@@ -665,6 +667,37 @@ pub fn FolderManager() -> Element {
                             "type": "number",
                             min: "1",
                             max: "5",
+                        }
+                    }
+
+                    // Default playlists to public
+                    div { class: "flex items-center justify-between p-3 bg-beet-dark rounded border border-white/10",
+                        div {
+                            p { class: "text-sm text-white font-medium", "Default playlists to public" }
+                            p { class: "text-xs text-gray-500 font-mono mt-0.5",
+                                "Playlists will be set to public (available to all Navidrome users) by default"
+                            }
+                        }
+                        button {
+                            class: format!(
+                                "relative w-11 h-6 rounded-full cursor-pointer transition-colors {}",
+                                if default_playlists_public() { "bg-beet-leaf" } else { "bg-gray-600" }
+                            ),
+                            onclick: move |_| async move {
+                                let new_val = !default_playlists_public();
+                                default_playlists_public.set(new_val);
+                                let update = api::UpdateUserSettings {
+                                    default_playlists_public: Some(new_val),
+                                    ..Default::default()
+                                };
+                                let _ = api::update_user_settings(update).await;
+                            },
+                            span {
+                                class: format!(
+                                    "absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform {}",
+                                    if default_playlists_public() { "translate-x-5" } else { "" }
+                                ),
+                            }
                         }
                     }
                 }

@@ -74,6 +74,7 @@ pub async fn get_discovery_config() -> Result<DiscoveryConfig, ServerFnError> {
         profiles: settings.discovery_profiles,
         playlist_names,
         last_generated_at: settings.discovery_last_generated_at,
+        default_playlist_public: settings.default_playlists_public,
     })
 }
 
@@ -1137,7 +1138,7 @@ pub async fn reconcile_discovery_playlists(user_id: &str) -> Result<(), String> 
         let comment = format!("Soulbeet discovery ({})", profile_name);
 
         match navi
-            .create_smart_playlist(&playlist_name, &comment, &profile_path)
+            .create_smart_playlist(&playlist_name, &comment, &profile_path, settings.default_playlists_public)
             .await
         {
             Ok(playlist_id) => {

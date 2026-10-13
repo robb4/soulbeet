@@ -96,6 +96,7 @@ pub struct DiscoveryConfig {
     pub profiles: String,
     pub playlist_names: std::collections::HashMap<String, String>,
     pub last_generated_at: Option<String>,
+    pub default_playlist_public: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
